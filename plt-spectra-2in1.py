@@ -19,9 +19,10 @@ if not foundplot:
     sys.exit()
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
+from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 
 print("The arguments are: " , str(sys.argv))
-
 # initialize settings
 molecule1 = ''
 molecule2 = ''
@@ -29,6 +30,7 @@ dftb_par = 0
 spec_type = 0
 do_dftb = True
 do_dft = False
+do_zoom = False
 molecule_list = ['naphthalene', 'anthracene', 'tetracene', 'chrysene',
         'pentacene', 'hexacene', 'heptacene', 'octacene']
 
@@ -36,18 +38,26 @@ molecule_list = ['naphthalene', 'anthracene', 'tetracene', 'chrysene',
 for index, arg in enumerate(sys.argv):    
     if arg in ['--info', '-i']:
         arg_list=['--molecule', '-m']+['--spec_type', '-st']+['--basis', '-b']
+        opt_list=['--molecule2', '-m2']+['--dft', '-dft']+['--functional', '-f']+['--dftb', '-dftb']+['--zoom','-z']
         print('Required keywords/arguments: ',arg_list)
+        print('Optional keywords/arguments: ',opt_list)
         sys.exit()
 
 for index, arg in enumerate(sys.argv):    
-    if arg in ['--dftb']:
+    if arg in ['--dftb','-dftb']:
         do_dftb = True
         del sys.argv[index]
         break
 
 for index, arg in enumerate(sys.argv):    
-    if arg in ['--dft']:
+    if arg in ['--dft','-dft']:
         do_dft = True
+        del sys.argv[index]
+        break
+
+for index, arg in enumerate(sys.argv):    
+    if arg in ['--zoom','-z']:
+        do_zoom = True
         del sys.argv[index]
         break
 
@@ -229,6 +239,25 @@ font2 = {'color':  'darkred',
         }
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
+# additional part for a zoomed-in plot
+if do_zoom:
+    zoom_factor = 2.0
+    axins = zoomed_inset_axes(ax1, zoom_factor, loc=4)
+    plt.xticks(visible=False)
+    #plt.yticks(visible=False)
+    plt.rc('ytick', labelsize=8)     # labelsize of the y ticks
+    plt.yticks(fontsize=12)          # fontsize of the y ticks
+
+if do_zoom:
+    # specify and apply the limits for zoomed inset
+    if spec_type == 1:
+        x1, x2, y1, y2 = 230, 250, -0.1, 6.0 
+    else :
+        x1, x2, y1, y2 = 210, 230, 0.0, 0.4 
+    axins.set_xlim(x1, x2) 
+    axins.set_ylim(y1, y2) 
+    mark_inset(ax1, axins, loc1=2, loc2=4, fc="none", ec="0.5")
+
 # plot convoluted spectra (with Gaussians by default)
 if spec_type == 1 :
     ax1.plot(x,composite/1e4,linewidth=1.2)
@@ -236,13 +265,20 @@ if spec_type == 1 :
     ax1.set_ylabel('$\epsilon$ [$10^4$ L mol$^{-1}$ cm$^{-1}$]')
     # y limit for convoluted spectra
     ax1.set_ylim(-0.5, 25.0)
+    if do_zoom:
+        axins.plot(x,composite/1e4,linewidth=1.2)
+        axins.plot(x,composite2/1e4,linewidth=1.2)
+
 # plot vertical (sticks) spectra (based on oscillator strengths)
 else :
-    ax1.bar(bands, f, width=1.5,edgecolor='None',color='#1f77b4',align='center')
-    ax1.bar(bands2, f2, width=1.5,edgecolor='None',color='#ff7f0e',align='center')
+    ax1.bar(bands, f, width=1.5,edgecolor='None',align='center')
+    ax1.bar(bands2, f2, width=1.5,edgecolor='None',align='center')
     ax1.set_ylabel('Oscillator strength [a.u.]')
     # y limit for vertical spectra
     ax1.set_ylim(0.0, 1.2)
+    if do_zoom:
+        axins.bar(bands, f, width=1.5,edgecolor='None',align='center')
+        axins.bar(bands2, f2, width=1.5,edgecolor='None',align='center')
 
 x3 = [1,2,3,4,5,6,7]
 ax1.set_xlim(200,400)
@@ -278,5 +314,10 @@ if only_dftb:
 else:
     output_name = '{0}-{1}-dftb-{2}-dft-{3}{4}'.format(molecule1[0:5],spectrum_type,basis,dft_functional,fileformat)
 
+if do_zoom:
+   temp_name = output_name[0:len(output_name)-len(fileformat)]
+   output_name = temp_name + '-wZOOM' + fileformat
+
+print('Output file: {}'.format(output_name))
 plt.savefig(output_name,dpi=600,bbox_inches='tight')
 
