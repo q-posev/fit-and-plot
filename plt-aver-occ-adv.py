@@ -263,15 +263,19 @@ if do_gaps:
     #plt.suptitle('Chrysene', fontsize=18)
     plt.plot(t,coin,'k-')
     plt.ylabel('$E_{'+str(init_st)+'} - E_{'+str(init_st-1)+'}$ [eV]')
+    # build output filename
+    fileformat = '.png'
     if prt_mol:
-        filename = mol_name+'_gaps_'+'traj'+str(k_gap)+'_init_st'+str(init_st)
+        output_name = '{}-'.format(mol_name)
     else:
-        filename = 'gaps_'+'traj'+str(k_gap)+'_init_st'+str(init_st)
-    #--------------------------- SAVE EPS --------------------------------#
-    #plt.savefig(filename+'.eps', bbox_inches='tight', format='eps', dpi=600)
-    #--------------------------- SAVE PNG --------------------------------#
-    plt.savefig(filename+'.png', bbox_inches='tight',dpi=600)
-    #---------------------------------------------------------------------#
+        output_name = ''
+    output_name = output_name + 'gaps-{0}traj-initST-{1}-totalST-{2}'.format(l1,init_st,n_st)
+    if plt_err:
+        output_name = output_name + '-wERR'
+    output_name = output_name + fileformat
+    
+    print('Output file: {}'.format(output_name))
+    plt.savefig(output_name, bbox_inches='tight',format=fileformat[1:4],dpi=600)
     plt.clf()
 
 acc = acc/l1
@@ -341,13 +345,16 @@ if plt_err:
 #---------------------------------------------------------------------#
 ax1.legend(('$S_{1-4}$', '$S_{'+str(init_st-2)+'}$', '$S_{'+str(init_st-1)+'}$', '$S_{'+str(init_st)+'}$', '$S_{'+str(init_st+1)+'}$', '$S_{'+str(init_st)+'}$ fit'),loc='upper center', bbox_to_anchor=(0.515, 1.03),ncol=3, fancybox=True, shadow=True) 
 #------------------------- SET OUTPUT FILENAME -----------------------#
+fileformat = '.png'
 if prt_mol:
-    filename = mol_name+'_occ_'+'traj'+str(l1)+'_init_st'+str(init_st)+'_total_st'+str(n_st)
+    output_name = '{}-'.format(mol_name)
 else:
-    filename = 'occ_'+'traj'+str(l1)+'_init_st'+str(init_st)+'_total_st'+str(n_st)
+    output_name = ''
+output_name = output_name + 'occ-{0}traj-initST-{1}-totalST-{2}'.format(l1,init_st,n_st)
 if plt_err:
-    filename = filename + '_ERRbar'
-#--------------------------- SAVE EPS --------------------------------#
-#plt.savefig(filename+'.eps', bbox_inches='tight', format='eps', dpi=600)
-#--------------------------- SAVE PNG --------------------------------#
-plt.savefig(filename+'.png', bbox_inches='tight',dpi=600)
+    output_name = output_name + '-wERR'
+output_name = output_name + fileformat
+
+print('Output file: {}'.format(output_name))
+plt.savefig(output_name, bbox_inches='tight',format=fileformat[1:4],dpi=600)
+

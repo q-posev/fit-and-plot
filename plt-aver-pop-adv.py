@@ -182,7 +182,7 @@ for k in range(1,n_st+1):
 j=0
 for i in range(0,l1):
 
-    # filename setting
+    # output_name setting
     if hpc=='oly':
         pop_file = oly_jobid+str(i) +'.demon' +'/'+'deMon.pop'
     else :
@@ -304,13 +304,16 @@ if plt_err:
 #---------------------------------------------------------------------#
 ax1.legend(('$S_{1-4}$', '$S_{5}$', '$S_{6}$', '$S_{7}$', '$S_{8}$', '$S_{7}$ fit'),loc='upper center', bbox_to_anchor=(0.515, 1.03),ncol=3, fancybox=True, shadow=True) 
 #------------------------- SET OUTPUT FILENAME -----------------------#
+fileformat = '.png'
 if prt_mol:
-    filename = mol_name+'_pop_'+'traj'+str(l1)+'_init_st'+str(init_st)+'_total_st'+str(n_st)
+    output_name = '{}-'.format(mol_name)
 else:
-    filename = 'pop_'+'traj'+str(l1)+'_init_st'+str(init_st)+'_total_st'+str(n_st)
+    output_name = ''
+output_name = output_name + 'pop-{0}traj-initST-{1}-totalST-{2}'.format(l1,init_st,n_st)
 if plt_err:
-    filename = filename + '_ERRbar'
-#--------------------------- SAVE EPS --------------------------------#
-#plt.savefig(filename+'.eps', bbox_inches='tight', format='eps', dpi=600)
-#--------------------------- SAVE PNG --------------------------------#
-plt.savefig(filename+'.png', bbox_inches='tight',dpi=600)
+    output_name = output_name + '-wERR'
+output_name = output_name + fileformat
+
+print('Output file: {}'.format(output_name))
+plt.savefig(output_name, bbox_inches='tight',format=fileformat[1:4],dpi=600)
+
