@@ -123,17 +123,30 @@ for index, arg in enumerate(sys.argv):
         else:
             print('Enter the second molecule name: (after --molecule2 or -m2 keyword)')
             sys.exit()
-
+# sanity check
 if dftb_par==0 or spec_type==0 or molecule1=='':
     print('One of the main arguments is missing, use --info or -i argument for more info')
     sys.exit()
+# this is to extract the name of the DFT functional
+# note: DFT vs DFTB spectra should be plotted for the same molecule (molecule1 be default)
+if do_dft:
+    for index, arg in enumerate(sys.argv):    
+        if arg in ['--functional', '-f']:
+            if len(sys.argv) > index + 1:
+                dft_functional = str(sys.argv[index + 1])
+                del sys.argv[index]
+                del sys.argv[index]
+                break
+            else:
+                print('Enter the DFT functional: (after --functional or -f keyword)')
+                sys.exit()
 # set datafiles
 if only_dftb:
     datafile1 = molecule1 + '/tddftb-' + basis + '-spec-' + molecule1[0:5] + '.txt'
     datafile2 = molecule2 + '/tddftb-' + basis + '-spec-' + molecule2[0:5] + '.txt'
 else:
     datafile1 = molecule1 + '/tddftb-' + basis + '-spec-' + molecule1[0:5] + '.txt'
-    datafile2 = molecule2 + '/tddftb-' + basis + '-spec-' + molecule2[0:5] + '.txt'
+    datafile2 = molecule1 + '/tddft-' + dft_functional + '-spec-' + molecule1[0:5] + '.txt'
 # load the data
 inp=np.loadtxt(datafile1, delimiter=' ')
 inp2=np.loadtxt(datafile2, delimiter=' ')
@@ -190,7 +203,6 @@ mi[0] = min(inp[:,0])
 mi[1] = min(inp2[:,0])
 ma[0] = max(inp[:,0])
 ma[1] = max(inp2[:,0])
-print(min(mi),max(ma))
 
 start2=min(mi)-1239.84193/50.0
 finish2=max(ma)+1239.84193/50.0
@@ -211,8 +223,7 @@ for count2,peak2 in enumerate(bands2):
 # matplotlib setting
 font = {'size'   : 18}
 plt.rc('font', **font)
-font2 = {'family': 'sansserif',
-        'color':  'darkred',
+font2 = {'color':  'darkred',
         'weight': 'normal',
         'size': 16,
         }
@@ -249,17 +260,23 @@ ax1.minorticks_on()
 ax1.tick_params(axis='both',which='minor',length=4,width=1,labelsize=18)
 ax1.tick_params(axis='both',which='major',length=8,width=1,labelsize=18)
 # set legend
-ax1.legend((molecule1.capitalize(), molecule2.capitalize()),loc='upper right',ncol=1, fancybox=True, shadow=True)
+if only_dftb:
+    ax1.legend((molecule1.capitalize(), molecule2.capitalize()),loc='upper right',ncol=1, fancybox=True, shadow=True)
+else :
+    plt.title('{} DFT versus DFTB'.format(molecule1.capitalize()), y=1.16, fontdict=font2)
+    ax1.legend(('DFTB ({})'.format(basis.upper()), 'DFT ({})'.format(dft_functional.upper())),loc='upper right',ncol=1, fancybox=True, shadow=True)
 # indicate specific bands in eV (e.g. from experiments) with vertical dashed lines
 if molecule1 == 'tetracene' and molecule2 == 'chrysene':
     band1 = 4.51
     band2 = 4.59
-ax1.axvline(x=1239.842/band1,color='#1f77b4', linestyle='--')
-ax1.axvline(x=1239.842/band2,color='#ff7f0e', linestyle='--')
+    ax1.axvline(x=1239.842/band1,color='#1f77b4', linestyle='--')
+    ax1.axvline(x=1239.842/band2,color='#ff7f0e', linestyle='--')
 # output the figure in a given format
-dash = '-'
 fileformat = '.png'
-output_name = molecule1[0:5]+dash+molecule2[0:5]+dash+spectrum_type+'-dftb-'+basis+fileformat
+if only_dftb:
+    output_name ='{0}-{1}-{2}-dftb-{3}{4}'.format(molecule1[0:5],molecule2[0:5],spectrum_type,basis,fileformat)
+else:
+    output_name = '{0}-{1}-dftb-{2}-dft-{3}{4}'.format(molecule1[0:5],spectrum_type,basis,dft_functional,fileformat)
 
 plt.savefig(output_name,dpi=600,bbox_inches='tight')
 
