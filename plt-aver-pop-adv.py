@@ -1,10 +1,42 @@
+import sys
+# perform sanity check of required modules
+import imp
+try:
+    imp.find_module('numpy')
+    foundnp = True
+except ImportError:
+    foundnp = False
+try:
+    imp.find_module('matplotlib')
+    foundplot = True
+except ImportError:
+    foundplot = False
+try:
+    imp.find_module('pandas')
+    foundpd = True
+except ImportError:
+    foundpd = False
+try:
+    imp.find_module('scipy')
+    foundsci = True
+except ImportError:
+    foundsci = False
+if not foundnp:
+    print("Numpy is required. Exiting")
+    sys.exit()
+if not foundplot:
+    print("Matplotlib is required. Exiting")
+    sys.exit()
+if not foundpd:
+    print("Pandas is required. Exiting")
+    sys.exit()
+if not foundsci:
+    print("Scipy is required. Exiting")
+    sys.exit()
 import pandas as pd
 import matplotlib.pyplot as plt
-import math
 import numpy as np
 from scipy.optimize import curve_fit
-import sys
-#import statistics as stat
 
 #print("Number of arguments: ", len(sys.argv))
 print("The arguments are: " , str(sys.argv))
