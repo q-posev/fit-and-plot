@@ -55,22 +55,6 @@ for index, arg in enumerate(sys.argv):
 for index, arg in enumerate(sys.argv):    
     if arg in ['--molecule', '-m']:
         if len(sys.argv) > index + 1:
-          molecule1 = str(sys.argv[index + 1])
-          if molecule1 not in molecule_list:
-            print('Available molecules: ', molecule_list)
-            print('Add your molecules to the list and rerun')
-            sys.exit()
-          else:
-            del sys.argv[index]
-            del sys.argv[index]
-            break
-        else:
-            print('Enter the molecule name: (after --molecule or -m keyword)')
-            sys.exit()
-
-for index, arg in enumerate(sys.argv):    
-    if arg in ['--molecule', '-m']:
-        if len(sys.argv) > index + 1:
           molecule2 = str(sys.argv[index + 1])
           if molecule2 not in molecule_list:
             print('Available molecules: ', molecule_list)
@@ -106,8 +90,8 @@ for index, arg in enumerate(sys.argv):
 for index, arg in enumerate(sys.argv):    
     if arg in ['--basis', '-b']:
         if len(sys.argv) > index + 1:
-          dftb_basis = str(sys.argv[index + 1])
-          if dftb_basis not in ['mat','bio']:
+          basis = str(sys.argv[index + 1])
+          if basis not in ['mat','bio']:
             print('Available DFTB basis: mat or bio')
             sys.exit()
           else:
@@ -131,7 +115,7 @@ datafile2 = molecule2 + '/tddftb-' + basis + '-spec-' + molecule2[0:5] + '.txt'
 
 inp=np.loadtxt(datafile1, delimiter=' ')
 inp2=np.loadtxt(datafile2, delimiter=' ')
-i
+
 l0 = len(inp)
 bands = np.zeros(l0)
 f = np.zeros(l0)
@@ -246,8 +230,10 @@ ax1.tick_params(axis='both',which='minor',length=4,width=1,labelsize=18)
 ax1.tick_params(axis='both',which='major',length=8,width=1,labelsize=18)
 ax1.legend((molecule1.capitalize(), molecule2.capitalize()),loc='upper right',ncol=1, fancybox=True, shadow=True)
 # indicate specific bands in eV (e.g. from experiments) with vertical dashed lines
-band1 = 2.63
-band2 = 4.51
+if molecule1 == 'tetracene' and molecule2 == 'chrysene':
+    band1 = 4.51
+    band2 = 4.59
+
 ax1.axvline(x=1239.842/band1,color='#1f77b4', linestyle='--')
 ax1.axvline(x=1239.842/band2,color='#ff7f0e', linestyle='--')
 
