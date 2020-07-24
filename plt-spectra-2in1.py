@@ -24,13 +24,13 @@ from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 # (ii) convoluted (with Gaussian or Lorentzian functions);
 
 #               Example of an execution line is presented below:
-# python plt-spectra-2in1.py --dft -f blyp --dftb -b bio -m phenanthrene -st vertical
+# python this_script_name.py --dft -f blyp --dftb -b bio -m phenanthrene -st vertical
 
 # -f stands for a functional used in TD-DFT (if --dft keyword is activated)
 # -b stands for a basis (parameters set) used in TD-DFTB (if --dftb is activated)
 # -m stands for a molecule name 
 # (spectra can be plotted for one molecule (DFT vs DFTB) or for two molecules, see -m2 keyword below)
-# (spectra can be plotted with a zoomed inset, see -z keyword)
+# (spectra can be plotted with a zoomed inset, see -z keyword but legend color has to be fixed)
 #===================================================================================================#
 print("The arguments are: " , str(argv))
 # initialize settings
