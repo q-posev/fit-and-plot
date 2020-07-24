@@ -1,15 +1,16 @@
 from sys import argv,exit
-from re import search as reg_search
 from imp import find_module
 # perform sanity check of required modules
 try:
     find_module('numpy')
 except ImportError:
     print("Numpy is required")
+    exit()
 try:
     find_module('matplotlib')
 except ImportError:
     print("Matplotlib is required")
+    exit()
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
