@@ -248,7 +248,7 @@ font = {'size'   : 18}
 plt.rc('font', **font)
 ax1 = plt.subplot(111)
 ax1.grid()
-#---------- DO NOT FORGET TO CHANGE THE X- and Y- LIMITS BELOW -------#
+#-------- DO NOT FORGET TO CHANGE THE X-AXIS LIMIT/RANGE BELOW -------#
 ax1.set_xlim((0.0, 300.0)) 
 ax1.set_ylim((0.0, 1.0))
 #---------------------------------------------------------------------#
