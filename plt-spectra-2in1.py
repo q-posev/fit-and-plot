@@ -1,28 +1,38 @@
-import sys
-# check for numpy and matplotlib, try to exit gracefully if not found
-import imp
+from sys import argv,exit
+from re import search as reg_search
+from imp import find_module
+# perform sanity check of required modules
 try:
-    imp.find_module('numpy')
-    foundnp = True
+    find_module('numpy')
 except ImportError:
-    foundnp = False
+    print("Numpy is required")
 try:
-    imp.find_module('matplotlib')
-    foundplot = True
+    find_module('matplotlib')
 except ImportError:
-    foundplot = False
-if not foundnp:
-    print("Numpy is required. Exiting")
-    sys.exit()
-if not foundplot:
-    print("Matplotlib is required. Exiting")
-    sys.exit()
+    print("Matplotlib is required")
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
 from mpl_toolkits.axes_grid1.inset_locator import mark_inset
+#===================================================================================================#
+# This scrupt is designed to plot UV absorption spectra computed with TD-DFT(B) 
+# The spectra have to be written in the .txt file where first line is a header with some comments
+# 1-st column are energies of singlet excited states in eV
+# 2-nd column are oscillator strengths (dimensionless)
+# Resulting spectrum can be (see -st or --spec_type keywords)
+# (i)  vertical (sticks);
+# (ii) convoluted (with Gaussian or Lorentzian functions);
 
-print("The arguments are: " , str(sys.argv))
+#               Example of an execution line is presented below:
+# python plt-spectra-2in1.py --dft -f blyp --dftb -b bio -m phenanthrene -st vertical
+
+# -f stands for a functional used in TD-DFT (if --dft keyword is activated)
+# -b stands for a basis (parameters set) used in TD-DFTB (if --dftb is activated)
+# -m stands for a molecule name 
+# (spectra can be plotted for one molecule (DFT vs DFTB) or for two molecules, see -m2 keyword below)
+# (spectra can be plotted with a zoomed inset, see -z keyword)
+#===================================================================================================#
+print("The arguments are: " , str(argv))
 # initialize settings
 molecule1 = ''
 molecule2 = ''
@@ -31,132 +41,132 @@ spec_type = 0
 do_dftb = True
 do_dft = False
 do_zoom = False
-molecule_list = ['naphthalene', 'anthracene', 'tetracene', 'chrysene',
-        'pentacene', 'hexacene', 'heptacene', 'octacene']
+molecule_list = ['naphthalene', 'anthracene', 'phenanthrene', 'tetracene', 
+        'chrysene', 'pentacene', 'hexacene', 'heptacene', 'octacene']
 
 # read the arguments and process them
-for index, arg in enumerate(sys.argv):    
+for index, arg in enumerate(argv):    
     if arg in ['--info', '-i']:
         arg_list=['--molecule', '-m']+['--spec_type', '-st']+['--basis', '-b']
         opt_list=['--molecule2', '-m2']+['--dft', '-dft']+['--functional', '-f']+['--dftb', '-dftb']+['--zoom','-z']
         print('Required keywords/arguments: ',arg_list)
         print('Optional keywords/arguments: ',opt_list)
-        sys.exit()
+        exit()
 
-for index, arg in enumerate(sys.argv):    
+for index, arg in enumerate(argv):    
     if arg in ['--dftb','-dftb']:
         do_dftb = True
-        del sys.argv[index]
+        del argv[index]
         break
 
-for index, arg in enumerate(sys.argv):    
+for index, arg in enumerate(argv):    
     if arg in ['--dft','-dft']:
         do_dft = True
-        del sys.argv[index]
+        del argv[index]
         break
 
-for index, arg in enumerate(sys.argv):    
+for index, arg in enumerate(argv):    
     if arg in ['--zoom','-z']:
         do_zoom = True
-        del sys.argv[index]
+        del argv[index]
         break
 
 only_dftb = (do_dftb and (not do_dft))
 print('Only DFTB spectra? {}'.format(only_dftb))
 
-for index, arg in enumerate(sys.argv):    
+for index, arg in enumerate(argv):    
     if arg in ['--molecule', '-m']:
-        if len(sys.argv) > index + 1:
-          molecule1 = str(sys.argv[index + 1])
+        if len(argv) > index + 1:
+          molecule1 = str(argv[index + 1])
           if molecule1 not in molecule_list:
             print('Available molecules: ', molecule_list)
             print('Add your molecules to the list and rerun')
-            sys.exit()
+            exit()
           else:
-            del sys.argv[index]
-            del sys.argv[index]
+            del argv[index]
+            del argv[index]
             break
         else:
             print('Enter the molecule name: (after --molecule or -m keyword)')
-            sys.exit()
+            exit()
 
-for index, arg in enumerate(sys.argv):    
+for index, arg in enumerate(argv):    
     if arg in ['--spec_type', '-st']:
-        if len(sys.argv) > index + 1:
-          spectrum_type = str(sys.argv[index + 1])
+        if len(argv) > index + 1:
+          spectrum_type = str(argv[index + 1])
           if spectrum_type not in ['convoluted','vertical']:
             print('Available types of spectra: convoluted or vertical')
-            sys.exit()
+            exit()
           else:
             if spectrum_type == 'convoluted' :
                 spec_type = 1
             else :
                 spec_type = 2
-            del sys.argv[index]
-            del sys.argv[index]
+            del argv[index]
+            del argv[index]
             break
         else:
             print('Enter the type of spectra: (after --spec_type or -st keyword)')
-            sys.exit()
+            exit()
 
-for index, arg in enumerate(sys.argv):    
+for index, arg in enumerate(argv):    
     if arg in ['--basis', '-b']:
-        if len(sys.argv) > index + 1:
-          basis = str(sys.argv[index + 1])
+        if len(argv) > index + 1:
+          basis = str(argv[index + 1])
           if basis not in ['mat','bio']:
             print('Available DFTB basis: mat or bio')
-            sys.exit()
+            exit()
           else:
             if basis == 'mat' :
                 dftb_par = 1
             else :
                 dftb_par = 2
-            del sys.argv[index]
-            del sys.argv[index]
+            del argv[index]
+            del argv[index]
             break
         else:
             print('Enter the DFTB basis: (after --basis or -b keyword)')
-            sys.exit()
+            exit()
 
-for index, arg in enumerate(sys.argv):    
+for index, arg in enumerate(argv):    
     if arg in ['--molecule2', '-m2']:
-        if len(sys.argv) > index + 1:
-            molecule2 = str(sys.argv[index + 1])
+        if len(argv) > index + 1:
+            molecule2 = str(argv[index + 1])
             if molecule2 not in molecule_list:
                 print('Available molecules: ', molecule_list)
                 print('Add your molecules to the list and rerun')
-                sys.exit()
+                exit()
             else:
-                del sys.argv[index]
-                del sys.argv[index]
+                del argv[index]
+                del argv[index]
             break
         else:
             print('Enter the second molecule name: (after --molecule2 or -m2 keyword)')
-            sys.exit()
+            exit()
 # sanity check
 if dftb_par==0 or spec_type==0 or molecule1=='':
     print('One of the main arguments is missing, use --info or -i argument for more info')
-    sys.exit()
+    exit()
 # this is to extract the name of the DFT functional
 # note: DFT vs DFTB spectra should be plotted for the same molecule (molecule1 be default)
 if do_dft:
-    for index, arg in enumerate(sys.argv):    
+    for index, arg in enumerate(argv):    
         if arg in ['--functional', '-f']:
-            if len(sys.argv) > index + 1:
-                dft_functional = str(sys.argv[index + 1])
-                del sys.argv[index]
-                del sys.argv[index]
+            if len(argv) > index + 1:
+                dft_functional = str(argv[index + 1])
+                del argv[index]
+                del argv[index]
                 break
             else:
                 print('Enter the DFT functional: (after --functional or -f keyword)')
-                sys.exit()
+                exit()
 # set datafiles
 if only_dftb:
-    datafile1 = molecule1 + '/tddftb-' + basis + '-spec-' + molecule1[0:5] + '.txt'
-    datafile2 = molecule2 + '/tddftb-' + basis + '-spec-' + molecule2[0:5] + '.txt'
+    datafile1 = molecule1 + '/tddftb-' + basis + '-' + molecule1[0:5] + '.txt'
+    datafile2 = molecule2 + '/tddftb-' + basis + '-' + molecule2[0:5] + '.txt'
 else:
-    datafile1 = molecule1 + '/tddftb-' + basis + '-spec-' + molecule1[0:5] + '.txt'
-    datafile2 = molecule1 + '/tddft-' + dft_functional + '-spec-' + molecule1[0:5] + '.txt'
+    datafile1 = molecule1 + '/tddftb-' + basis + '-' + molecule1[0:5] + '.txt'
+    datafile2 = molecule1 + '/tddft-' + dft_functional + '-' + molecule1[0:5] + '.txt'
 # load the data
 inp=np.loadtxt(datafile1, delimiter=' ')
 inp2=np.loadtxt(datafile2, delimiter=' ')
@@ -195,7 +205,7 @@ points=10000
 # basic check that we have the same number of bands and oscillator strengths
 if len(bands) != len(f):
     print('Number of bands does not match the number of oscillator strengths.')
-    sys.exit()
+    exit()
 # information on producing spectral curves (Gaussian and Lorentzian) is adapted from:
 # P. J. Stephens, N. Harada, Chirality 22, 229 (2010).
 # Gaussian curves are often a better fit for UV/Vis.
@@ -237,8 +247,8 @@ font2 = {'color':  'darkred',
         'weight': 'normal',
         'size': 16,
         }
-fig = plt.figure()
-ax1 = fig.add_subplot(111)
+
+ax1 = plt.subplot(111)
 # additional part for a zoomed-in plot
 if do_zoom:
     zoom_factor = 2.0
@@ -264,7 +274,7 @@ if spec_type == 1 :
     ax1.plot(x,composite2/1e4,linewidth=1.2)
     ax1.set_ylabel('$\epsilon$ [$10^4$ L mol$^{-1}$ cm$^{-1}$]')
     # y limit for convoluted spectra
-    ax1.set_ylim(-0.5, 25.0)
+    ax1.set_ylim(-0.5, 15.0)
     if do_zoom:
         axins.plot(x,composite/1e4,linewidth=1.2)
         axins.plot(x,composite2/1e4,linewidth=1.2)
@@ -273,15 +283,15 @@ if spec_type == 1 :
 else :
     ax1.bar(bands, f, width=1.5,edgecolor='None',align='center')
     ax1.bar(bands2, f2, width=1.5,edgecolor='None',align='center')
-    ax1.set_ylabel('Oscillator strength [a.u.]')
+    ax1.set_ylabel('Oscillator strength')
     # y limit for vertical spectra
-    ax1.set_ylim(0.0, 1.2)
+    ax1.set_ylim(0.0, 0.8)
     if do_zoom:
         axins.bar(bands, f, width=1.5,edgecolor='None',align='center')
         axins.bar(bands2, f2, width=1.5,edgecolor='None',align='center')
 
 x3 = [1,2,3,4,5,6,7]
-ax1.set_xlim(200,400)
+ax1.set_xlim(200,370)
 ax1.set_xlabel('$\lambda$ [nm]')
 # create a second X-axis in eV and put it on top
 nm2eV = lambda t: 1239.84193/t
@@ -297,27 +307,35 @@ ax1.tick_params(axis='both',which='minor',length=4,width=1,labelsize=18)
 ax1.tick_params(axis='both',which='major',length=8,width=1,labelsize=18)
 # set legend
 if only_dftb:
-    ax1.legend((molecule1.capitalize(), molecule2.capitalize()),loc='upper right',ncol=1, fancybox=True, shadow=True)
+    ax1.legend((molecule1.capitalize(), molecule2.capitalize()),
+            loc='upper right',ncol=1, fancybox=True, shadow=True)
 else :
-    plt.title('{} DFT versus DFTB'.format(molecule1.capitalize()), y=1.16, fontdict=font2)
-    ax1.legend(('DFTB ({})'.format(basis.upper()), 'DFT ({})'.format(dft_functional.upper())),loc='upper right',ncol=1, fancybox=True, shadow=True)
+#    plt.title('{} DFT versus DFTB'.format(molecule1.capitalize()), y=1.16, fontdict=font2)
+    ax1.legend(('DFTB ({})'.format(basis.upper()), 'DFT ({})'.format(dft_functional.upper())),
+            loc='upper right',ncol=1, fancybox=True, shadow=True)
 # indicate specific bands in eV (e.g. from experiments) with vertical dashed lines
 if molecule1 == 'tetracene' and molecule2 == 'chrysene':
     band1 = 4.51
     band2 = 4.59
     ax1.axvline(x=1239.842/band1,color='#1f77b4', linestyle='--')
     ax1.axvline(x=1239.842/band2,color='#ff7f0e', linestyle='--')
+if molecule1 == 'phenanthrene':
+    # from Halasinki 2004
+    bands_matrix = [341.1,284.3,273.4,262.4,243.0,229.0]
+    bands_jet = [340.9,282.6]
+    [ax1.axvline(_x, linestyle='--', color='green') for _x in bands_matrix]
+    [ax1.axvline(_x, linestyle='--', color='red') for _x in bands_jet]
 # output the figure in a given format
-fileformat = '.png'
+fileformat = 'eps'
 if only_dftb:
-    output_name ='{0}-{1}-{2}-dftb-{3}{4}'.format(molecule1[0:5],molecule2[0:5],spectrum_type,basis,fileformat)
+    output_name ='{0}-{1}-{2}-dftb-{3}.{4}'.format(molecule1[0:5],molecule2[0:5],spectrum_type,basis,fileformat)
 else:
-    output_name = '{0}-{1}-dftb-{2}-dft-{3}{4}'.format(molecule1[0:5],spectrum_type,basis,dft_functional,fileformat)
+    output_name = '{0}-{1}-dftb-{2}-dft-{3}.{4}'.format(molecule1[0:5],spectrum_type,basis,dft_functional,fileformat)
 
 if do_zoom:
-   temp_name = output_name[0:len(output_name)-len(fileformat)]
-   output_name = temp_name + '-wZOOM' + fileformat
+   temp_name = output_name[0:len(output_name)-len(fileformat)-1]
+   output_name = temp_name + '-wZOOM.' + fileformat
 
 print('Output file: {}'.format(output_name))
-plt.savefig(output_name,dpi=600,bbox_inches='tight')
+plt.savefig(output_name,dpi=600,format=fileformat,bbox_inches='tight')
 
