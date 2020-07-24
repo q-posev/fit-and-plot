@@ -6,18 +6,22 @@ try:
     find_module('numpy')
 except ImportError:
     print("Numpy is required")
+    exit()
 try:
     find_module('matplotlib')
 except ImportError:
     print("Matplotlib is required")
+    exit()
 try:
     find_module('pandas')
 except ImportError:
     print("Pandas is required")
+    exit()
 try:
     find_module('scipy')
 except ImportError:
     print("Scipy is required")
+    exit()
 
 from pandas import read_csv
 import matplotlib.pyplot as plt
@@ -182,7 +186,7 @@ for k in range(1,n_st+1):
     pop_list.append('pop'+str(k))
 
 # loop over all trajectories/jobs
-j=0
+traj_count=0
 for i in range(0,l1):
     # set files with data to be read
     if hpc=='oly':
@@ -199,14 +203,14 @@ for i in range(0,l1):
         df = read_csv(pop_file,skiprows=0,sep='    ',header=None,engine='python')
         df.columns = ["time"]+pop_list
         for population in pop_list:
-            df0[population] = df0[population] + df[population]
+            df0[population] += df[population]
     
-    j+=1
+    traj_count += 1
 
 #print("  Number of processed trajectories: {}".format(j))
-# average the populations over ensemble
+# average populations over the ensemble of trajectories
 for population in pop_list:
-    df0[population] = df0[population]/j
+    df0[population] /= traj_count
 
 # fitting parameters
 A_step = min(df0['pop'+str(init_st)])
@@ -230,7 +234,7 @@ fit_s2 = exp_func(t,*popt)
 if plt_err:
     fit_max = np.zeros(l2)
     fit_min = np.zeros(l2)
-    eps = 0.98/np.sqrt(l1)
+    eps = 0.98/np.sqrt(traj_count)
     tau_fit = 1.0/popt
     tau_max = (1.+eps)*tau_fit
     tau_min = (1.-eps)*tau_fit
