@@ -207,7 +207,7 @@ for i in range(0,l1):
     
     traj_count += 1
 
-#print("  Number of processed trajectories: {}".format(j))
+#print("  Number of processed trajectories: {}".format(traj_count))
 # average populations over the ensemble of trajectories
 for population in pop_list:
     df0[population] /= traj_count
@@ -220,14 +220,14 @@ A_step2 = A_step/(1.+A_step)
 def exp_func(x, b):
         return (np.exp(-b*x)+A_step)*A_decay
 t=df0.time
-fit_s2 = np.zeros(l2)
+fit_pop = np.zeros(l2)
 #---------------------------------------------------------------------#
 #--------- FIT THE INITIAL STATE POPULATION WITH EXPONENT ------------#
 #---------------------------------------------------------------------#
 popt,pcov = curve_fit(exp_func,t,df0['pop'+str(init_st)],p0=(0.025))
 #---------------------------------------------------------------------#
 print('  Decay time of S{0} = {1:.3f} fs \n'.format(init_st,float(1./popt)))
-fit_s2 = exp_func(t,*popt)
+fit_pop = exp_func(t,*popt)
 #---------------------------------------------------------------------#
 #---------------- STATISTICAL ERROR ESTIMATION -----------------------#
 #---------------------------------------------------------------------#
@@ -270,7 +270,7 @@ if do_sum:
 
 for population in pop_list:
     ax1.plot(t,df0[population],linewidth=2.0)
-ax1.plot(t,fit_s2,dashes=[6, 2],color='black',linewidth=2.0) 
+ax1.plot(t,fit_pop,dashes=[6, 2],color='black',linewidth=2.0) 
 #------------------- PLOT STATISTICAL ERROR --------------------------#
 if plt_err:
     ax1.fill_between(t, fit_min, fit_max, facecolor='lightcoral', alpha=0.5)
