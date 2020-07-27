@@ -180,6 +180,7 @@ en_list.append('e_cur')
 if do_gaps:
     j_gap = 0
     k_gap = 0
+    # change the value below to plot each N_gap-th trajectory
     N_gap = 1
     font = {'size'   : 18}
     plt.rc('font', **font)
@@ -206,27 +207,23 @@ for i in range(0,l1):
     df.columns = ['time','cur_st','gs']+en_list
     for k in range(0,l2):
         for j in range(1,n_st+1):
-            if (df.cur_st[k]==j):
+            if df.cur_st[k]==j:
                 acc[k,j]=acc[k,j]+1.0
 
     # plot energy gaps between Initial State and the one below for each N_spec-th trajectory
     if do_gaps:
-        if ((j_gap+1)%N_gap==0):
-            if ((j_gap+1)==N_gap): 
+        if (j_gap+1)%N_gap==0:
+            if (j_gap+1)==N_gap: 
                 df11 = read_csv(ener_file,skiprows=8,sep='  ',header=None,engine='python')
                 df11.columns = ['time','cur_st','gs']+en_list
                 df11.e_cur = 0.0
-            #---------------------------------------------------------------------#
-            #--- CHANGE eX and eX-1 BELOW TO BE EQUAL TO INIT_ST AND INIT_ST-1 ---#
-            #---------------------------------------------------------------------#
-            axs.plot(t,abs(df.e7-df.e6)*27.211,'r-')            
-            if ((j_gap+1)>N_gap):
+
+            axs.plot(t,abs(df['e'+str(init_st)].e7-df['e'+str(init_st-1)])*27.211,'r-')            
+            if (j_gap+1)>N_gap:
                 df11.e_cur = df11.e_cur+abs(df.e7-df.e6)
-            #---------------------------------------------------------------------#        
             k_gap+=1
         
         j_gap+=1
-
 #---------------------------------------------------------------------#        
 #----------------------------- PLOT GAPS -----------------------------#
 #---------------------------------------------------------------------#        
@@ -242,10 +239,9 @@ if do_gaps:
     
     df11.e_cur = df11.e_cur/k_gap
     axs.plot(t,df11.e_cur*27.211,'k--')
-    # set Conical Intersection threshold values
+    # set value for the Conical Intersection threshold
     coin=np.zeros(l2)
-    for i1 in range(0,l2):
-        coin[i1] = 0.0004*27.211
+    coin[0:l2] = 0.0004*27.211
 
     #plt.suptitle('Chrysene', fontsize=18)
     plt.plot(t,coin,'k-')
