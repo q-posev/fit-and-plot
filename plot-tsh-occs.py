@@ -1,5 +1,4 @@
 from sys import argv,exit
-from re import search as reg_search
 from imp import find_module
 # perform sanity check of required modules
 try:
@@ -32,15 +31,16 @@ print("The arguments are: " , str(argv))
 print('')
 plt_err = False
 prt_mol = False
+do_sum = False
 do_gaps = False
 l1 = 0
 hpc = ''
 n_st = 0
 init_st = 0
 #------------------- SEE THE EXECUTION EXAMPLE BELOW: ----------------#
-#--------   python this_script_name.py -h s10 -t 100 -n 9 -s 8 -pe ---#
+#------ python this_script_name.py -h s10 -t 100 -n 9 -s 8 --sum 4 ---#
 #------ Data from: s10; Trajectories: 100; Number of states: 9; ------#
-#-----      Initial state: 8; Plot WITH error bar (-pe option)  ------#
+#-----  Initial state: 8; Sum populations of 4 lowest states    ------#
 #---------------------------------------------------------------------#
 
 # read file todolist with list of jobs to be processed
@@ -54,7 +54,7 @@ for index, arg in enumerate(argv):
         arg_list=arg_list+['--n_states', '-n']+['--init_state', '-s']
         print('Required keywords/arguments: ',arg_list)
         print('Optional keywords/arguments: [\'--folder\', \'-f\', \'--plt_err\', \'-pe\','
-                ' \'--mol_name\', \'-m\',\'--gaps\', \'-g\']')
+                '[\'--sum\', \'--folder\', \'-f\', \'--plt_err\', \'-pe\', \'--mol_name\', \'-m\']')
         exit()
 
 for index, arg in enumerate(argv):    
@@ -133,6 +133,21 @@ for index, arg in enumerate(argv):
             print('Enter the initial state in TSH (after --init_state or -s keyword)')
             exit()
 
+for index, arg in enumerate(argv):
+    if arg in ['--sum']:
+        if len(argv) > index + 1:
+          occ_to_sum = int(argv[index + 1])
+          do_sum = True
+          if occ_to_sum > n_st-1:
+            print:('Too many states to sum')
+            exit()
+          else:
+            del argv[index]
+            del argv[index]
+            break
+        else:
+            print('Enter the number of lower states to be summed (after --sum keyword)')
+            exit()
 for index, arg in enumerate(argv):    
     if arg in ['--plt_err', '-pe']:
         plt_err= True
@@ -218,7 +233,7 @@ for i in range(0,l1):
                 df11.columns = ['time','cur_st','gs']+en_list
                 df11.e_cur = 0.0
 
-            axs.plot(t,abs(df['e'+str(init_st)].e7-df['e'+str(init_st-1)])*27.211,'r-')            
+            axs.plot(t,abs(df['e'+str(init_st)]-df['e'+str(init_st-1)])*27.211,'r-')            
             if (j_gap+1)>N_gap:
                 df11.e_cur = df11.e_cur+abs(df.e7-df.e6)
             k_gap+=1
@@ -241,7 +256,7 @@ if do_gaps:
     axs.plot(t,df11.e_cur*27.211,'k--')
     # set value for the Conical Intersection threshold
     coin=np.zeros(l2)
-    coin[0:l2] = 0.0004*27.211
+    coin[:] = 0.0004*27.211
 
     #plt.suptitle('Chrysene', fontsize=18)
     plt.plot(t,coin,'k-')
@@ -313,15 +328,36 @@ ax1.tick_params(axis='both',which='major',length=8,width=1,labelsize=18)
 ax1.set_xlabel('Time [fs]')
 ax1.set_ylabel('Occupation')
 #---------------------------------------------------------------------#
-#------ MODIFY THE PART BELOW TO PLOT THE POPULATIONS OF INTEREST  ---#
+#-----------------  PLOT THE OCCUPATIONS OF INTEREST  ----------------#
 #---------------------------------------------------------------------#
-ax1.plot(t,acc[:,1]+acc[:,2]+acc[:,3]+acc[:,4],t,acc[:,init_st-2],t,acc[:,init_st-1],t,acc[:,init_st],t,acc[:,init_st+1],linewidth=2.0)
+occ_list = [ind for ind in range(1,n_st+1)]
+if do_sum:
+    for i in range(2,occ_to_sum+1):
+        acc[:,1] += acc[:,i]
+        occ_list.remove(i)
+
+for occupation in occ_list:
+    ax1.plot(t,acc[:,occupation],linewidth=2.0)
 ax1.plot(t,fit_occ,dashes=[6, 2],color='black',linewidth=2.0) 
 #------------------- PLOT STATISTICAL ERROR --------------------------#
 if plt_err:
     ax1.fill_between(t, fit_min, fit_max, facecolor='lightcoral', alpha=0.5)
 #---------------------------------------------------------------------#
-ax1.legend(('$S_{1-4}$', '$S_{'+str(init_st-2)+'}$', '$S_{'+str(init_st-1)+'}$', '$S_{'+str(init_st)+'}$', '$S_{'+str(init_st+1)+'}$', '$S_{'+str(init_st)+'}$ fit'),loc='upper center', bbox_to_anchor=(0.515, 1.28),ncol=3, fancybox=True, shadow=True) 
+#---------- GENERATE LEGENDS ACCORDING TO THE PLOTTED POPULATIONS ----#
+#---------------------------------------------------------------------#
+legend_list=[]
+if do_sum:
+    legend_sum = '$S_{1-'+str(occ_to_sum)+'}$'
+    legend_list.append(legend_sum)
+else:
+    legend_list.append('$S_{}$'.format('1'))
+
+for occupation in occ_list:
+    if occupation != 1:
+        legend_list.append('$S_{}$'.format(occupation))
+legend_list.append('$S_{}$ fit'.format(init_st))
+
+ax1.legend(legend_list,loc='upper center', bbox_to_anchor=(0.515, 1.28), ncol=3, fancybox=True, shadow=True) 
 #------------------------- SET OUTPUT FILENAME -----------------------#
 if prt_mol:
     output_name = '{}-'.format(mol_name)

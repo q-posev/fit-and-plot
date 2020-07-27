@@ -260,13 +260,11 @@ ax1.set_ylabel('Population')
 #---------------------------------------------------------------------#
 #-----------------  PLOT THE POPULATIONS OF INTEREST  ----------------#
 #---------------------------------------------------------------------#
-pop_removed = []
 if do_sum:
     for i in range(2,pop_to_sum+1):
         pop_add = 'pop'+str(i)
         df0['pop1'] += df0[pop_add]
         pop_list.remove(pop_add)
-        pop_removed.append(pop_add)
 
 for population in pop_list:
     ax1.plot(t,df0[population],linewidth=2.0)
