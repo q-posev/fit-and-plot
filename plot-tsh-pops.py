@@ -181,7 +181,8 @@ print('Number of states in TSH  = {}'.format(n_st))
 print('Initial state in TSH     = {}\n'.format(init_st))
 
 # initialize the population list
-pop_list=[]
+pop_init = 'pop' + str(init_st)
+pop_list = []
 for k in range(1,n_st+1):
     pop_list.append('pop'+str(k))
 
@@ -213,7 +214,7 @@ for population in pop_list:
     df0[population] /= traj_count
 
 # fitting parameters
-A_step = min(df0['pop'+str(init_st)])
+A_step = min(df0[pop_init])
 A_decay = 1./(1.+A_step)
 A_step2 = A_step/(1.+A_step)
 # fitting function
@@ -224,7 +225,7 @@ fit_pop = np.zeros(l2)
 #---------------------------------------------------------------------#
 #--------- FIT THE INITIAL STATE POPULATION WITH EXPONENT ------------#
 #---------------------------------------------------------------------#
-popt,pcov = curve_fit(exp_func,t,df0['pop'+str(init_st)],p0=(0.025))
+popt,pcov = curve_fit(exp_func,t,df0[pop_init],p0=(0.025))
 #---------------------------------------------------------------------#
 print('  Decay time of S{0} = {1:.3f} fs \n'.format(init_st,float(1./popt)))
 fit_pop = exp_func(t,*popt)
@@ -280,7 +281,7 @@ if do_sum:
     legend_sum = '$S_{1-'+str(pop_to_sum)+'}$'
     legend_list.append(legend_sum)
 else:
-    legend_list.append('$S_{}$'.format('1'))
+    legend_list.append('$S_1$')
 for population in pop_list:
     if population != 'pop1':
         legend_list.append('$S_{}$'.format(int(reg_search(r'\d+', population)[0])))
@@ -289,7 +290,7 @@ legend_list.append('$S_{}$ fit'.format(init_st))
 ax1.legend(legend_list,loc='upper center', bbox_to_anchor=(0.515, 1.28), ncol=3, fancybox=True, shadow=True) 
 #------------------------- SET OUTPUT FILENAME -----------------------#
 if prt_mol:
-    output_name = '{}-'.format(mol_name)
+    output_name = mol_name + '-'
 else:
     output_name = ''
 output_name = output_name + 'pop-{0}traj-initST-{1}-totalST-{2}-tau-{3:.0f}.'.format(l1,init_st,n_st,float(1./popt))

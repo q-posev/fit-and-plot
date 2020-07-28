@@ -235,7 +235,7 @@ for i in range(0,l1):
 
             axs.plot(t,abs(df['e'+str(init_st)]-df['e'+str(init_st-1)])*27.211,'r-')            
             if (j_gap+1)>N_gap:
-                df11.e_cur = df11.e_cur+abs(df.e7-df.e6)
+                df11.e_cur = df11.e_cur+abs(df['e'+str(init_st)]-df['e'+str(init_st-1)])
             k_gap+=1
         
         j_gap+=1
@@ -264,7 +264,7 @@ if do_gaps:
     # build output filename
     fileformat = 'png'
     if prt_mol:
-        output_name = '{}-'.format(mol_name)
+        output_name = mol_name + '-'
     else:
         output_name = ''
     output_name = output_name + 'gaps-{0}traj-initST-{1}-totalST-{2}.'.format(l1,init_st,n_st)
@@ -350,7 +350,7 @@ if do_sum:
     legend_sum = '$S_{1-'+str(occ_to_sum)+'}$'
     legend_list.append(legend_sum)
 else:
-    legend_list.append('$S_{}$'.format('1'))
+    legend_list.append('$S_1$')
 
 for occupation in occ_list:
     if occupation != 1:
@@ -360,7 +360,7 @@ legend_list.append('$S_{}$ fit'.format(init_st))
 ax1.legend(legend_list,loc='upper center', bbox_to_anchor=(0.515, 1.28), ncol=3, fancybox=True, shadow=True) 
 #------------------------- SET OUTPUT FILENAME -----------------------#
 if prt_mol:
-    output_name = '{}-'.format(mol_name)
+    output_name = mol_name + '-'
 else:
     output_name = ''
 output_name = output_name + 'occ-{0}traj-initST-{1}-totalST-{2}-tau-{3:.0f}.'.format(l1,init_st,n_st,float(1./popt))
