@@ -195,8 +195,8 @@ en_list.append('e_cur')
 if do_gaps:
     j_gap = 0
     k_gap = 0
-    # change the value below to plot each N_gap-th trajectory
-    N_gap = 1
+    # change the value below to plot each n_gap-th trajectory
+    n_gap = 1
     font = {'size'   : 18}
     plt.rc('font', **font)
     fig, axs = plt.subplots(1, 1)
@@ -227,14 +227,14 @@ for i in range(0,l1):
 
     # plot energy gaps between Initial State and the one below for each N_spec-th trajectory
     if do_gaps:
-        if (j_gap+1)%N_gap==0:
-            if (j_gap+1)==N_gap: 
+        if (j_gap+1)%n_gap==0:
+            if (j_gap+1)==n_gap: 
                 df11 = read_csv(ener_file,skiprows=8,sep='  ',header=None,engine='python')
                 df11.columns = ['time','cur_st','gs']+en_list
                 df11.e_cur = 0.0
 
             axs.plot(t,abs(df['e'+str(init_st)]-df['e'+str(init_st-1)])*27.211,'r-')            
-            if (j_gap+1)>N_gap:
+            if (j_gap+1)>n_gap:
                 df11.e_cur = df11.e_cur+abs(df['e'+str(init_st)]-df['e'+str(init_st-1)])
             k_gap+=1
         
@@ -283,12 +283,11 @@ acc /= l1
 #print(acc[l2-1,init_st-1])
 
 # fitting parameters
-A_step = min(acc[:,init_st])
-A_decay = 1./(1.+A_step)
-A_step2 = A_step/(1.+A_step)
+a_step = min(acc[:,init_st])
+a_decay = 1./(1.+a_step)
 # fitting function
 def exp_func(x, b):
-        return (np.exp(-b*x)+A_step)*A_decay
+        return (np.exp(-b*x)+a_step)*a_decay
 t=df0.time
 fit_occ = np.zeros(l2)
 #---------------------------------------------------------------------#

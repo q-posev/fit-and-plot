@@ -214,12 +214,11 @@ for population in pop_list:
     df0[population] /= traj_count
 
 # fitting parameters
-A_step = min(df0[pop_init])
-A_decay = 1./(1.+A_step)
-A_step2 = A_step/(1.+A_step)
+a_step = min(df0[pop_init])
+a_decay = 1./(1.+a_step)
 # fitting function
 def exp_func(x, b):
-        return (np.exp(-b*x)+A_step)*A_decay
+        return (np.exp(-b*x)+a_step)*a_decay
 t=df0.time
 fit_pop = np.zeros(l2)
 #---------------------------------------------------------------------#
