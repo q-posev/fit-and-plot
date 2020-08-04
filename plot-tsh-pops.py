@@ -43,18 +43,16 @@ init_st = 0
 #-----  Initial state: 8; Sum populations of 4 lowest states    ------#
 #---------------------------------------------------------------------#
 
-# read file todolist with list of jobs to be processed
-todo = read_csv('todolist',skiprows=0,header=None)
-todo.columns = ["job"]
-
 # read arguments and settings
 for index, arg in enumerate(argv):    
     if arg in ['--info', '-i']:
-        arg_list=['--hpc', '-h']+['--traj_number', '-t']
-        arg_list=arg_list+['--n_states', '-n']+['--init_state', '-s']
-        print('Required keywords/arguments: ',arg_list)
-        print('Optional keywords/arguments:' +
-                '[\'--sum\', \'--folder\', \'-f\', \'--plt_err\', \'-pe\', \'--mol_name\', \'-m\']')
+        arg_list  = ['--hpc', '-h']     + ['--traj_number', '-t']
+        arg_list += ['--n_states', '-n']+ ['--init_state', '-s']
+        opt_list  = ['--folder', '-f']  + ['--plt_err', '-pe']
+        opt_list += ['--sum']           + ['--mol_name', '-m']
+
+        print('Required keywords/arguments: ', arg_list)
+        print('Optional keywords/arguments: ', opt_list)
         exit()
 
 for index, arg in enumerate(argv):    
@@ -179,6 +177,10 @@ if hpc=='s10':
 print('Number of trajectories   = {}'.format(l1))
 print('Number of states in TSH  = {}'.format(n_st))
 print('Initial state in TSH     = {}\n'.format(init_st))
+
+# read file todolist with list of jobs to be processed
+todo = read_csv('todolist',skiprows=0,header=None)
+todo.columns = ["job"]
 
 # initialize the population list
 pop_init = 'pop' + str(init_st)
