@@ -353,8 +353,8 @@ else:
 
 for occupation in occ_list:
     if occupation != 1:
-        legend_list.append('$S_{}$'.format(occupation))
-legend_list.append('$S_{}$ fit'.format(init_st))
+        legend_list.append('$S_{'+str(occupation)+'}$')
+legend_list.append('$S_{'+str(init_st)+'}$ fit')
 
 ax1.legend(legend_list,loc='upper center', bbox_to_anchor=(0.515, 1.28), ncol=3, fancybox=True, shadow=True) 
 #------------------------- SET OUTPUT FILENAME -----------------------#

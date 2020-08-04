@@ -283,8 +283,8 @@ else:
     legend_list.append('$S_1$')
 for population in pop_list:
     if population != 'pop1':
-        legend_list.append('$S_{}$'.format(int(reg_search(r'\d+', population)[0])))
-legend_list.append('$S_{}$ fit'.format(init_st))
+        legend_list.append('$S_{'+str(int(reg_search(r'\d+', population)[0]))+'}$')
+legend_list.append('$S_{'+str(init_st)+'}$ fit')
 
 ax1.legend(legend_list,loc='upper center', bbox_to_anchor=(0.515, 1.28), ncol=3, fancybox=True, shadow=True) 
 #------------------------- SET OUTPUT FILENAME -----------------------#
