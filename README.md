@@ -1,8 +1,6 @@
 # fit-and-plot
 
-The fit-and-plot set of scripts was developed during my PhD at Paul Sabatier University in Toulouse.
-
-It aims to facilitate the post-processing of TD-DFT(B) and Trajectory Surface Hopping (TSH) simulations
+The fit-and-plot set of scripts aims to facilitate the post-processing of TD-DFT(B) and Trajectory Surface Hopping (TSH) simulations
 performed with the deMon-Nano code on High-Performance Computing clusters. 
 
 However, these scripts can be easily adapted for any other software.
@@ -44,7 +42,7 @@ python plot-tsh-pops.py -h oly -f 666/ -t 100 -n 9 -s 8 --sum 4 -m chrysene
 - -f is the name of the folder with TSH results (not required for s10)
 - -t is the number of trajectories to analyze 
 - -n is the total number of excited states in the propagation
-- -s in the initially excited state (its population will be exponentially fitted)
+- -s is the initially excited state (its population will be exponentially fitted)
 
 _**Note: You need to have a todolist file (with ID-s of trajectories) in the same directory as the script. This is particularly important for results from s10 cluster.**_
 
