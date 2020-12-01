@@ -9,14 +9,13 @@ However, these scripts can be easily adapted for any other software.
 
 - plot-tsh-pops.py : plot averaged populations and fit the initial one with a single exponent
 - plot-tsh-occs.py : plot averaged occupations and fit the initial one with a single exponent 
-- plot-spectra-2in1.py : plot two absorption spectra for comparison
 
 #### Requirements:
 - python 3
-- matplotlib
-- numpy
-- scipy
-- pandas
+  - matplotlib
+  - numpy
+  - scipy
+  - pandas
 
 _**Note: I recommend using virtual environments to avoid compatibility issues.**_
 
@@ -64,6 +63,3 @@ One additional argument (--gaps or -g) can be used to plot the energy gap
 between the intially excited state and the one below in energy 
 along each trajectory together with the averaged (over an entire ensemble) value.
 
-## Spectra example
-
-TODO
