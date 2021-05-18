@@ -1,11 +1,6 @@
 # fit-and-plot
 
 
-
-[![DOI](https://sandbox.zenodo.org/badge/250819502.svg)](https://sandbox.zenodo.org/badge/latestdoi/250819502)
-
-
-
 The fit-and-plot set of scripts aims to facilitate the post-processing of TD-DFT(B) and Trajectory Surface Hopping (TSH) simulations
 performed with the deMon-Nano code on High-Performance Computing clusters. 
 
